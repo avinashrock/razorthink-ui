@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 import ImageListView from './ImageListView';
+import Pagination from './Pagination';
 import swal from 'sweetalert';
-import './App.css'
+import '../App.css'
 
 class SearchBar extends Component {
     constructor(props){
@@ -11,10 +12,20 @@ class SearchBar extends Component {
             value: '',
             list: [],
             random: [],
+            currentPage: 1,
+            imagesPerPage: 9,
             isLoading: false,
         };
         this.ref = React.createRef();
     }
+
+    setCurrentPage = (pageNumber) => {
+        this.setState({
+            currentPage: pageNumber,
+        })
+    }
+
+   paginate = pageNumber => this.setCurrentPage(pageNumber);
 
     componentDidMount() {
         let newState = [...this.state.random];
@@ -42,19 +53,31 @@ class SearchBar extends Component {
         })
     }
 
+    sliceTheArray = (list) => {
+        let slicedArray = []
+        if(list){
+            list.forEach(element => {
+                slicedArray = element.data.results.map((result) => {
+                    return result
+                   });
+                });
+        }
+        return slicedArray;
+    }
+
     makeApiCall = (e) => {
         e.preventDefault();
-        let newState = {...this.state};
+        let newState = [...this.state.list];
         axios.get('https://api.unsplash.com/search/photos/', {
             params: {
                 query: `${this.ref.current.value}`,
-                per_page: 9,
+                per_page: 30,
                 client_id: 'v8pmF3vkmzMEGpcSEfLfTLNNesvssIRJsJW_QNBqmhI',
             }
         }).then(response => {
-            newState.list = [...this.state.list, response];
+            newState = [...this.state.list, response];
             this.setState({
-                list: newState.list,
+                list: newState,
                 isLoading: true,
             })
         }).catch(err => {
@@ -62,9 +85,11 @@ class SearchBar extends Component {
         })
     }
     
-
     render() {
-        const { list, isLoading } = this.state;
+        const { list, isLoading, currentPage, imagesPerPage } = this.state;
+        const indexOfLastImage = currentPage * imagesPerPage;
+        const indexOfFirstImage = indexOfLastImage - imagesPerPage;
+        const currentImages = this.sliceTheArray(list).slice(indexOfFirstImage, indexOfLastImage);
         return(
         <>
         <div id="randomImage" className="input">
@@ -77,7 +102,7 @@ class SearchBar extends Component {
         <span className="searching">Search</span></button>
         <div className="content">
         <input ref={this.ref} type="search" autoComplete="off" className="input-box" name="searchKeyword" 
-                placeholder="Search anything" required id="searchIt" title="Search" 
+                placeholder="Search anything" required id="searchIt" title="Search"
                 autoCapitalize="none" spellCheck="false" value={this.state.value}
                 onChange={this.handleChange}>
         </input>
@@ -85,7 +110,12 @@ class SearchBar extends Component {
         </form>
         </div>
         <div>
-        {<ImageListView listView={list} isLoading={isLoading} />}
+        {<ImageListView listView={currentImages} isLoading={isLoading} />}
+        {list.length > 0 ? <Pagination
+        imagesPerPage={imagesPerPage}
+        totalImages={list[0].data.results.length}
+        paginate={this.paginate}
+      /> : null}
        </div>
       </>
       );
