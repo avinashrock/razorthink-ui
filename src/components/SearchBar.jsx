@@ -30,7 +30,11 @@ class SearchBar extends Component {
     componentDidMount() {
         let newState = [...this.state.random];
         window.addEventListener('load', () => {
-            axios.get('https://api.unsplash.com/photos/random?client_id=v8pmF3vkmzMEGpcSEfLfTLNNesvssIRJsJW_QNBqmhI').then(response => {
+            axios.get('https://api.unsplash.com/photos/random?client_id=v8pmF3vkmzMEGpcSEfLfTLNNesvssIRJsJW_QNBqmhI', {
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                }
+            }).then(response => {
                 newState  = [...this.state.random, response];
                 this.setState({
                     random: newState,
@@ -73,6 +77,8 @@ class SearchBar extends Component {
                 query: `${this.ref.current.value}`,
                 per_page: 30,
                 client_id: 'v8pmF3vkmzMEGpcSEfLfTLNNesvssIRJsJW_QNBqmhI',
+            }, headers: {
+                    'Access-Control-Allow-Origin': '*',
             }
         }).then(response => {
             newState = [...this.state.list, response];
