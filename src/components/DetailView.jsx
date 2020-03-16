@@ -1,23 +1,31 @@
 import React, { Component } from 'react';
-import './App.css';
-import {Link, BrowserRouter as Router, Route} from 'react-router-dom';
-import Home from './Home';
+import '../App.css';
+import { Link, withRouter } from 'react-router-dom';
 
 class DetailView extends Component {
   
+  handleBack = () => {
+    this.props.history.goBack()
+  }
+
    componentDidMount() {
     const { open } = this.props;
     var modal = document.getElementById("myModal");
     open ? modal.style.display = "block" : modal.style.display = "none";
-    
+    window.addEventListener('click' , (event) => {
+      if (event.target === modal) {
+        modal.style.display = "none";
+        this.handleBack();
+      }
+    })
    }
 
     render() {
         const { url, downloadLink, onClose } = this.props;
         return(
-            <div id="myModal" className="modal" onClick={onClose}>
+            <div id="myModal" className="modal">
             <div className="modal-content">
-             <Link to="/images"><span className="close">&times;</span></Link>
+             <Link to="/"><span className="close" onClick={onClose}>&times;</span></Link>
               <div className="image-position">
               <img height="500rem" width="500rem" src={url} alt="unknown gallery"/>
               </div>
@@ -34,4 +42,4 @@ class DetailView extends Component {
     }
 }
 
-export default DetailView;
+export default withRouter(DetailView);
