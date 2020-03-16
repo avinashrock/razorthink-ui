@@ -1,46 +1,23 @@
 import React, { Component } from 'react';
 import './App.css';
+import {Link, BrowserRouter as Router, Route} from 'react-router-dom';
+import Home from './Home';
 
 class DetailView extends Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      isOpen: false
-    }
-  }
-
+  
    componentDidMount() {
-    const { id } = this.props;
+    const { open } = this.props;
     var modal = document.getElementById("myModal");
-
-    var imgElement = document.getElementById(id);
+    open ? modal.style.display = "block" : modal.style.display = "none";
     
-    var span = document.getElementsByClassName("close")[0];
-    
-    // When the user clicks on the image open the modal
-    imgElement.onclick = function() {
-      modal.style.display = "block";
-    }
-    
-    // When the user clicks on <span> (x), close the modal
-    span.onclick = function() {
-      modal.style.display = "none";
-    }
-    
-    // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function(event) {
-      if (event.target === modal) {
-        modal.style.display = "none";
-      }
-    }
    }
 
     render() {
-        const { url, downloadLink } = this.props;
+        const { url, downloadLink, onClose } = this.props;
         return(
-            <div id="myModal" className="modal">
+            <div id="myModal" className="modal" onClick={onClose}>
             <div className="modal-content">
-              <span className="close">&times;</span>
+             <Link to="/images"><span className="close">&times;</span></Link>
               <div className="image-position">
               <img height="500rem" width="500rem" src={url} alt="unknown gallery"/>
               </div>
